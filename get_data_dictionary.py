@@ -9,59 +9,61 @@ import requests
 
 # ## LOOKER API CLASS [[ its in the lookerapi we are importing!]]
 
-# class LookerApi(object):
+class LookerApi(object):
 
-#     def __init__(self, token, secret, host):
+    def __init__(self, token, secret, host):
 
-#         self.token = token
-#         self.secret = secret
-#         self.host = host
+        self.token = token
+        self.secret = secret
+        self.host = host
 
-#         self.session = requests.Session()
-#         self.session.verify = False
-#         self.auth()
+        self.session = requests.Session()
+        self.session.verify = False
+        self.auth()
 
-#     def auth(self):
-#         url = '{}{}'.format(self.host,'login')
-#         params = {'client_id':self.token,
-#                   'client_secret':self.secret
-#                   }
-#         r = self.session.post(url,params=params)
-#         access_token = r.json().get('access_token')
-#         # print access_token
-#         self.session.headers.update({'Authorization': 'token {}'.format(access_token)})
+    def auth(self):
+        url = '{}{}'.format(self.host,'login')
+        params = {'client_id':self.token,
+                  'client_secret':self.secret
+                  }
+        r = self.session.post(url,params=params)
+        access_token = r.json().get('access_token')
+        # print access_token
+        self.session.headers.update({'Authorization': 'token {}'.format(access_token)})
 
-# # GET /lookml_models/
-#     def get_models(self,fields={}):
-#         url = '{}{}'.format(self.host,'lookml_models')
-#         # print url
-#         params = fields
-#         r = self.session.get(url,params=params)
-#         if r.status_code == requests.codes.ok:
-#             return r.json()
-# # GET /lookml_models/{{NAME}}
-#     def get_model(self,model_name=None,fields={}):
-#         url = '{}{}/{}'.format(self.host,'lookml_models', model_name)
-#         # print url
-#         params = fields
-#         r = self.session.get(url,params=params)
-#         if r.status_code == requests.codes.ok:
-#             return r.json()
+# GET /lookml_models/
+    def get_models(self,fields={}):
+        url = '{}{}'.format(self.host,'lookml_models')
+        # print url
+        params = fields
+        r = self.session.get(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+# GET /lookml_models/{{NAME}}
+    def get_model(self,model_name=None,fields={}):
+        url = '{}{}/{}'.format(self.host,'lookml_models', model_name)
+        # print url
+        params = fields
+        r = self.session.get(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
 
-# # GET /lookml_models/{{NAME}}/explores/{{NAME}}
-#     def get_explore(self,model_name=None,explore_name=None,fields={}):
-#         url = '{}{}/{}/{}/{}'.format(self.host,'lookml_models', model_name, 'explores', explore_name)
-#         print url
-#         params = fields
-#         r = self.session.get(url,params=params)
-#         if r.status_code == requests.codes.ok:
-#             return r.json()
+# GET /lookml_models/{{NAME}}/explores/{{NAME}}
+    def get_explore(self,model_name=None,explore_name=None,fields={}):
+        url = '{}{}/{}/{}/{}'.format(self.host,'lookml_models', model_name, 'explores', explore_name)
+        print url
+        params = fields
+        r = self.session.get(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
 
 
-## CSV WRITING
-
+## --------- csv writing -------
 
 def write_fields(explore, fields):
+
+	### First, compile the fields you need for your row
+
 	explore_fields=explore['fields']
 	try:
 		connection_name = str(explore['connection_name'])
@@ -85,7 +87,7 @@ def write_fields(explore, fields):
 		value_format=str(dimension['value_format'])
 		source = str(dimension['source_file'])
 
-
+	### compile the line - this is possible to combine above, but here to keep things simple
 		rowout = []
 		rowout.append(connection_name)
 		rowout.append(field_type)
@@ -104,9 +106,6 @@ def write_fields(explore, fields):
 		rowout.append(source)
 
 		w.writerow(rowout)
-
-
-## REAL CODE!
 
 ## --------- csv formatting -------------
 
@@ -135,7 +134,7 @@ w.writerow(header)
 
 ## --------- API Config -------------
 
-f = open('config.yml')
+f = open('../config.yml')
 params = yaml.load(f)
 f.close()
 
@@ -154,18 +153,16 @@ looker = LookerApi(host=my_host,
 ## --------- API Calls -------------
 
 ## -- Get all models --
-models = looker.get_models()
-# pp(models)
+models = looker.get_model("")
+pp(models)
 for model in models:
 	model_name = model['name']
-
 
 	## -- Get single model --
 	model_def = looker.get_model(model_name)
 	# pp(model_def)
 
-
-	## -- Get single explre --
+	## -- Get single explore --
 	for explore_def in model_def['explores']:
 		explore=looker.get_explore(model_name, explore_def['name'])
 		# pp(explore)
@@ -179,3 +176,4 @@ for model in models:
 			write_fields(explore,'dimensions')
 		except:
 			print 'Problem dimension fields in ', explore_def['name']
+

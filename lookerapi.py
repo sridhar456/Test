@@ -131,6 +131,24 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 
+# PATCH /users/id
+    def update_user(self,id="",body={}):
+        url = '{}{}{}'.format(self.host,'users/',id)
+        # print "Grabbing User(s) " + str(id)
+        # print url
+        params = json.dumps(body)
+        r = self.session.patch(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+
+# GET /user
+    def get_current_user(self):
+        url = '{}{}'.format(self.host,'user')
+        params = {}
+        r = self.session.get(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+
 # PUT /users/{user_id}/roles
     def set_user_role(self,id="", body={}):
         url = '{}{}{}{}'.format(self.host,'users/',id,'/roles')
@@ -141,10 +159,18 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 
-            # PUT /users/{user_id}/roles
+# GET /users/{user_id}/roles
     def get_user_role(self,id=""):
         url = '{}{}{}{}'.format(self.host,'users/',id,'/roles')
         # print "Grabbing User(s) " + str(id)
+        # print url
+        r = self.session.get(url,params={})
+        if r.status_code == requests.codes.ok:
+            return r.json()
+
+    def get_roles(self):
+        url = '{}{}'.format(self.host,'roles')
+        # print "Grabbing role(s) "
         # print url
         r = self.session.get(url,params={})
         if r.status_code == requests.codes.ok:
@@ -183,9 +209,9 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 # GET /lookml_models/{{NAME}}
-    def get_model(self,model_name=None,fields={}):
+    def get_model(self,model_name="",fields={}):
         url = '{}{}/{}'.format(self.host,'lookml_models', model_name)
-        # print url
+        print url
         params = fields
         r = self.session.get(url,params=params)
         if r.status_code == requests.codes.ok:
@@ -194,7 +220,7 @@ class LookerApi(object):
 # GET /lookml_models/{{NAME}}/explores/{{NAME}}
     def get_explore(self,model_name=None,explore_name=None,fields={}):
         url = '{}{}/{}/{}/{}'.format(self.host,'lookml_models', model_name, 'explores', explore_name)
-        print url
+        # print url
         params = fields
         r = self.session.get(url,params=params)
         if r.status_code == requests.codes.ok:
