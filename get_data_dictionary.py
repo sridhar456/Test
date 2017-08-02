@@ -134,11 +134,11 @@ w.writerow(header)
 
 ## --------- API Config -------------
 
-f = open('../config.yml')
+f = open('config.yml')
 params = yaml.load(f)
 f.close()
 
-hostname = 'localhost'
+hostname = 'sandbox'
 
 my_host = params['hosts'][hostname]['host']
 my_secret = params['hosts'][hostname]['secret']
