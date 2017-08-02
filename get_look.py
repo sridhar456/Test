@@ -7,7 +7,7 @@ from pprint import pprint
 ### ------- HERE ARE PARAMETERS TO CONFIGURE -------
 
 look_to_get = 123
-host = 'sandbox'
+host = 'localhost'
 
 
 ### ------- OPEN THE CONFIG FILE and INSTANTIATE API -------
