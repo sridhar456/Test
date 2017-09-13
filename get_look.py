@@ -1,4 +1,4 @@
-import yaml. ### install the pyyaml package
+import yaml ### install the pyyaml package
 from lookerapi import LookerApi
 from datetime import datetime
 from pprint import pprint 
