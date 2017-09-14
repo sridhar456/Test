@@ -137,7 +137,7 @@ class LookerApi(object):
         # print "Grabbing User(s) " + str(id)
         # print url
         params = json.dumps(body)
-        r = self.session.patch(url,params=params)
+        r = self.session.patch(url,data=params)
         if r.status_code == requests.codes.ok:
             return r.json()
 
