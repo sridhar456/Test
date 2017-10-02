@@ -264,4 +264,20 @@ class LookerApi(object):
         # pp(r.request.body)
         return r.json()
 
+#DELETE /looks/{look_id}
+    def delete_look(self,look_id,fields=''):
+        url = '{}{}/{}'.format(self.host,'looks',look_id)
+        print url
+        params = {"fields":fields}
+        r = self.session.delete(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
 
+#DELETE /dashboards/{dashboard_id}
+    def delete_dashboard(self,dashboard_id,fields=''):
+        url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
+        print url
+        params = {"fields":fields}
+        r = self.session.delete(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
