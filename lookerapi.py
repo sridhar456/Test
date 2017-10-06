@@ -43,7 +43,7 @@ class LookerApi(object):
         pp(r.request.body)
         pp(r.json())
 
-# PATCH 
+# PATCH
     def update_dashboard(self, dashboard_id):
         url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
         params = json.dumps({'load_configuration':'prefetch_cache_run'
@@ -135,11 +135,13 @@ class LookerApi(object):
     def update_user(self,id="",body={}):
         url = '{}{}{}'.format(self.host,'users/',id)
         # print "Grabbing User(s) " + str(id)
-        # print url
+        print url
         params = json.dumps(body)
         r = self.session.patch(url,params=params)
+        r = self.session.patch(url,data=params)        
         if r.status_code == requests.codes.ok:
             return r.json()
+
 
 # GET /user
     def get_current_user(self):
@@ -191,7 +193,7 @@ class LookerApi(object):
         return r.json()
 
 
-# GET /users/me 
+# GET /users/me
     def get_me(self):
         url = '{}{}'.format(self.host,'user')
         print "Grabbing Myself: " + url
@@ -264,4 +266,20 @@ class LookerApi(object):
         # pp(r.request.body)
         return r.json()
 
+#DELETE /looks/{look_id}
+    def delete_look(self,look_id,fields=''):
+        url = '{}{}/{}'.format(self.host,'looks',look_id)
+        print url
+        params = {"fields":fields}
+        r = self.session.delete(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
 
+#DELETE /dashboards/{dashboard_id}
+    def delete_dashboard(self,dashboard_id,fields=''):
+        url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
+        print url
+        params = {"fields":fields}
+        r = self.session.delete(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
