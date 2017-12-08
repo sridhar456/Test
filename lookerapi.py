@@ -63,16 +63,16 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 # GET /queries/
-    def get_query(self,query_id):
+    def get_query(self,query_id,fields=''):
         url = '{}{}/{}'.format(self.host,'queries',query_id)
         print url
-        params = {}
+        params = {"fields":fields}
         r = self.session.get(url,params=params)
         if r.status_code == requests.codes.ok:
             return r.json()
 
     # POST /queries/
-    def create_query(self,query_body, fields):
+    def create_query(self,query_body, fields=''):
         url = '{}{}'.format(self.host,'queries')
         print url
         params = json.dumps(query_body)
@@ -87,6 +87,17 @@ class LookerApi(object):
         print url
         params = {limit:100000}
         r = self.session.get(url,params=params, stream=True)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+
+# PATCH /looks/<look_id>
+    def update_look(self,look_id,body,fields=''):
+        url = '{}{}/{}'.format(self.host,'looks',look_id)
+        print url
+        body = json.dumps(body)
+        params = {"fields":fields}
+        print " --- updating look --- "
+        r = self.session.patch(url,data=body,params=params)
         if r.status_code == requests.codes.ok:
             return r.json()
 
@@ -137,7 +148,7 @@ class LookerApi(object):
         # print "Grabbing User(s) " + str(id)
         print url
         params = json.dumps(body)
-        r = self.session.patch(url,data=params)        
+        r = self.session.patch(url,data=params)
         if r.status_code == requests.codes.ok:
             return r.json()
 
