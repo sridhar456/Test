@@ -248,12 +248,12 @@ class LookerApi(object):
 
 
 #GET /scheduled_plans
-    def get_all_schedules(self, all_users=False):
+    def get_all_schedules(self, user_id=False):
         url = '{}{}'.format(self.host,'scheduled_plans')
         # print url
-        params = json.dumps({'all_users':all_users})
-        r = self.session.get(url)
-        if r.status_code == requests.codes.ok:
+        params = {'user_id':user_id}
+	r = self.session.get(url,params=params)
+	if r.status_code == requests.codes.ok:
             return r.json()
 
 #GET /scheduled_plans/look/{dashboard_id}
@@ -275,6 +275,14 @@ class LookerApi(object):
         # pp(r.request.url)
         # pp(r.request.body)
         return r.json()
+
+#DELETE /scheduled_plans/{scheduled_plan_id}
+    def delete_schedule(self, plan_id):
+        url = '{}{}/{}'.format(self.host,'scheduled_plans', plan_id)
+        # print url
+        r = self.session.delete(url)
+        if r.status_code == requests.codes.ok:
+            return r.json()
 
 #DELETE /looks/{look_id}
     def delete_look(self,look_id,fields=''):
