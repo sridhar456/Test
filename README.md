@@ -30,3 +30,5 @@ Python examples of how to use the Looker API
 |get_data_dictionary.py|Put together a list of each field, and various attributes in your data model, this outputs a CSV|Make sure your host is configured in the config.yml file. If you change the 'localhost' variable in config.yml also change line 143 of get_data_dictionary.py to reference the proper credentials. The output file from the script is named dictionary.csv in the repository directory.|
 |update_user.py|Update user parameters with a CSV| In the script, reference a CSV which maps individual user IDs to whichever user parameters you would like to update. Use the `/users/{user_id}/credentials_email` endpoint to update email/password login information.|
 |update_static_filter.py|Update a static filter value on a look| Illustrates how to update a static value associated with a filter field|
+|delete_expired_schedules.py|Delete schedules that have an expiry date in the title|Gets a list of all schedules and then checks the title for an expiry date specified in the title.  If the current date is past that date, delete the schedule|
+
