@@ -1,3 +1,5 @@
+import sys
+import os
 import yaml ### install the pyyaml package
 from lookerapi import LookerApi
 from datetime import datetime
@@ -6,7 +8,7 @@ from pprint import pprint
 
 ### ------- HERE ARE PARAMETERS TO CONFIGURE -------
 
-look_to_get = 123
+looks_to_delete = sys.argv[1]
 host = 'localhost'
 
 
@@ -25,12 +27,19 @@ looker = LookerApi(host=my_host,
                  secret = my_secret)
 
 
-### ------- GET AND PRINT THE LOOK -------
+### ------- HANDLE ARGUMENT FILELIST OR SINGLE LOOK -------
 
-data = looker.get_look()
-
-pprint(data)
+if os.path.isfile(looks_to_delete):
+	filelist = open(looks_to_delete)
+	for i in filelist:
+		print "deleting lookid: " + i
+		data = looker.delete_look(i)
+		pprint(data)
+else:
+	data = looker.delete_look(looks_to_delete)
+	pprint(data)
 
 ### ------- Done -------
 
 print "Done"
+

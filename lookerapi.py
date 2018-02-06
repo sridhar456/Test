@@ -43,7 +43,7 @@ class LookerApi(object):
         pp(r.request.body)
         pp(r.json())
 
-# PATCH 
+# PATCH
     def update_dashboard(self, dashboard_id):
         url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
         params = json.dumps({'load_configuration':'prefetch_cache_run'
@@ -63,10 +63,10 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 # GET /queries/
-    def get_query(self,query_id):
+    def get_query(self,query_id,fields=''):
         url = '{}{}/{}'.format(self.host,'queries',query_id)
         print url
-        params = {}
+        params = {"fields":fields}
         r = self.session.get(url,params=params)
         if r.status_code == requests.codes.ok:
             return r.json()
@@ -118,6 +118,17 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 
+# PATCH /looks/<look_id>
+    def update_look(self,look_id,body,fields=''):
+        url = '{}{}/{}'.format(self.host,'looks',look_id)
+        print url
+        body = json.dumps(body)
+        params = {"fields":fields}
+        print " --- updating look --- "
+        r = self.session.patch(url,data=body,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+
     def download_look(self,look_id, format='xlsx'):
         url = '{}{}/{}/run/{}'.format(self.host,'looks',look_id, format)
         params = {}
@@ -164,9 +175,9 @@ class LookerApi(object):
     def update_user(self,id="",body={}):
         url = '{}{}{}'.format(self.host,'users/',id)
         # print "Grabbing User(s) " + str(id)
-        # print url
+        print url
         params = json.dumps(body)
-        r = self.session.patch(url,params=params)
+        r = self.session.patch(url,data=params)
         if r.status_code == requests.codes.ok:
             return r.json()
 # DELETE /users/id
@@ -178,6 +189,7 @@ class LookerApi(object):
         r = self.session.delete(url)
         if r.status_code == requests.codes.ok:
             return r.json()
+
 
 # GET /user
     def get_current_user(self):
@@ -229,7 +241,7 @@ class LookerApi(object):
         return r.json()
 
 
-# GET /users/me 
+# GET /users/me
     def get_me(self):
         url = '{}{}'.format(self.host,'user')
         print "Grabbing Myself: " + url
@@ -274,12 +286,12 @@ class LookerApi(object):
 
 
 #GET /scheduled_plans
-    def get_all_schedules(self, all_users=False):
+    def get_all_schedules(self, user_id=False):
         url = '{}{}'.format(self.host,'scheduled_plans')
         # print url
-        params = json.dumps({'all_users':all_users})
-        r = self.session.get(url)
-        if r.status_code == requests.codes.ok:
+        params = {'user_id':user_id}
+	r = self.session.get(url,params=params)
+	if r.status_code == requests.codes.ok:
             return r.json()
 
 #GET /scheduled_plans/look/{dashboard_id}
@@ -311,6 +323,7 @@ class LookerApi(object):
         # pp(r.request.body)
         return r.json()
 
+
     def sql_runner(self):
         connection_id = "looker"
         sql = "select * from events limit 10"
@@ -327,5 +340,28 @@ class LookerApi(object):
         print url
         return g.json()
 
+#DELETE /scheduled_plans/{scheduled_plan_id}
+    def delete_schedule(self, plan_id):
+        url = '{}{}/{}'.format(self.host,'scheduled_plans', plan_id)
+        # print url
+        r = self.session.delete(url)
+        if r.status_code == requests.codes.ok:
+            return r.json()
 
+#DELETE /looks/{look_id}
+    def delete_look(self,look_id,fields=''):
+        url = '{}{}/{}'.format(self.host,'looks',look_id)
+        print url
+        params = {"fields":fields}
+        r = self.session.delete(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
 
+#DELETE /dashboards/{dashboard_id}
+    def delete_dashboard(self,dashboard_id,fields=''):
+        url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
+        print url
+        params = {"fields":fields}
+        r = self.session.delete(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
