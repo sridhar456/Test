@@ -72,14 +72,42 @@ class LookerApi(object):
             return r.json()
 
     # POST /queries/
-    def create_query(self,query_body, fields):
+    def create_query(self,query_body, fields=[]):
         url = '{}{}'.format(self.host,'queries')
-        print url
+        # print url
         params = json.dumps(query_body)
         print " --- creating query --- "
         r = self.session.post(url,data=params, params = json.dumps({"fields": fields}))
+        # print r.text
+        # print r.status_code
         if r.status_code == requests.codes.ok:
             return r.json()
+
+
+      #GET      queries/run/
+    def run_query(self,query_id):
+            url = '{}{}/{}/run/json'.format(self.host,'queries',query_id)
+            # print url
+            params = {}
+            print " --- running query --- "
+            r = self.session.get(url,params=params)
+            if r.status_code == requests.codes.ok:
+                return r.json()
+
+      #GET      queries/run/
+    def run_inline_query(self,body={}):
+            url = '{}{}/run/json'.format(self.host,'queries')
+            # print url
+            params = json.dumps(body)
+            # print " --- running query --- "
+            r = self.session.post(url,data=params)
+            # print url
+            # print r.status_code
+            # print r
+            if r.status_code == requests.codes.ok:
+                return r.json()
+
+
 
 # GET /looks/<look_id>/run/<format>
     def get_look(self,look_id, format='json', limit=500):
@@ -131,6 +159,7 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 
+
 # PATCH /users/id
     def update_user(self,id="",body={}):
         url = '{}{}{}'.format(self.host,'users/',id)
@@ -138,6 +167,15 @@ class LookerApi(object):
         # print url
         params = json.dumps(body)
         r = self.session.patch(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+# DELETE /users/id
+    def delete_user(self,id="",body={}):
+        url = '{}{}{}'.format(self.host,'users/',id)
+        # print "Grabbing User(s) " + str(id)
+        # print url
+        # params = json.dumps(body)
+        r = self.session.delete(url)
         if r.status_code == requests.codes.ok:
             return r.json()
 
@@ -253,6 +291,15 @@ class LookerApi(object):
             return r.json()
 
 
+# GET /datagroups
+    def get_datagroups(self):
+        url = '{}{}'.format(self.host,'datagroups')
+        r = self.session.get(url)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+
+
+
 #PATCH /scheduled_plans/{scheduled_plan_id}
     def update_schedule(self, plan_id, body={}):
         url = '{}{}/{}'.format(self.host,'scheduled_plans',plan_id)
@@ -263,5 +310,22 @@ class LookerApi(object):
         # pp(r.request.url)
         # pp(r.request.body)
         return r.json()
+
+    def sql_runner(self):
+        connection_id = "looker"
+        sql = "select * from events limit 10"
+        body = {}
+        body['sql'] = sql
+        body['connection_id'] = connection_id
+        url = '{}{}'.format(self.host,'sql_queries')
+        params = json.dumps(body)
+        r = self.session.post(url,data=params)
+        slug = r.json()['slug']
+
+        url = '{}{}/{}'.format(self.host,'sql_queries', slug)
+        g = self.session.get(url)
+        print url
+        return g.json()
+
 
 

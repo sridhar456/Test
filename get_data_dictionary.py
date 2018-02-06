@@ -1,13 +1,12 @@
 # -*- coding: UTF-8 -*-
 import yaml
-from lookerapi import LookerApi
+# from lookerapi import LookerApi
 from pprint import pprint as pp
 import json
 import csv
 import requests
 
-
-# ## LOOKER API CLASS [[ its in the lookerapi we are importing!]]
+# ## LOOKER API CLASS [[ its in the lookerapi object you may be importing! - uncomment the 3rd Line!]]
 
 class LookerApi(object):
 
@@ -31,10 +30,10 @@ class LookerApi(object):
         # print access_token
         self.session.headers.update({'Authorization': 'token {}'.format(access_token)})
 
-# GET /lookml_models/
-    def get_models(self,fields={}):
-        url = '{}{}'.format(self.host,'lookml_models')
-        # print url
+# GET /lookml_models/{{NAME}}
+    def get_model(self,model_name="",fields={}):
+        url = '{}{}/{}'.format(self.host,'lookml_models', model_name)
+        print url
         params = fields
         r = self.session.get(url,params=params)
         if r.status_code == requests.codes.ok:
@@ -60,7 +59,7 @@ class LookerApi(object):
 
 ## --------- csv writing -------
 
-def write_fields(explore, fields):
+def write_fields(explore, fields, model_name =""):
 
 	### First, compile the fields you need for your row
 
@@ -75,6 +74,7 @@ def write_fields(explore, fields):
 		field_type = fields
 		project = str(dimension['project_name'])
 		explore = str(explore_def['name'])
+		model = str(model_name)
 		view=str(dimension['view'])
 		view_label=str(dimension['view_label'])
 		name=str(dimension['name'])
@@ -92,6 +92,7 @@ def write_fields(explore, fields):
 		rowout.append(connection_name)
 		rowout.append(field_type)
 		rowout.append(project)
+		rowout.append(model)
 		rowout.append(explore)
 		rowout.append(view)
 		rowout.append(view_label)
@@ -115,6 +116,7 @@ w = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 header = ['connection_name',
 			'field_type',
 			'project',
+			'model',
 			'explore',
 			'view',
 			'view_label',
@@ -138,7 +140,7 @@ f = open('config.yml')
 params = yaml.load(f)
 f.close()
 
-hostname = 'sandbox'
+hostname = '<<YOUR HOST>>'
 
 my_host = params['hosts'][hostname]['host']
 my_secret = params['hosts'][hostname]['secret']
@@ -169,11 +171,11 @@ for model in models:
 		## -- parse explore --
 		
 		try:
-			write_fields(explore,'measures')
+			write_fields(explore,'measures', model_name)
 		except:
 			print 'Problem measure fields in ', explore_def['name']
 		try:
-			write_fields(explore,'dimensions')
+			write_fields(explore,'dimensions', model_name)
 		except:
 			print 'Problem dimension fields in ', explore_def['name']
 
