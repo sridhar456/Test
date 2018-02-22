@@ -140,7 +140,7 @@ f = open('config.yml')
 params = yaml.load(f)
 f.close()
 
-hostname = '<<YOUR HOST>>'
+hostname = 'localhost'
 
 my_host = params['hosts'][hostname]['host']
 my_secret = params['hosts'][hostname]['secret']
