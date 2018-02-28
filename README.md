@@ -14,7 +14,7 @@ Python examples of how to use the Looker API
 - Change the config_sample.yml to config.yml and update with your credentials. You can get API 3 credentials by:
    1) Go to Admin > Users in your Looker instance.
    2) Either make a new user or click to an existing users page using the "Edit" button. Remember the API user will have the same credentials as the user so keep that security point in mind when choosing a user.
-   3) Click the "New API 3 Key" button to make API 3 credentials for the user. 
+   3) Click the "New API 3 Key" button to make API 3 credentials for the user.
    4) In the config.yml file, the "Client Secret" on the user page should be copied into the `secret:` string and the Client ID should be copied into the `token:` string. For the `host:` string replace the word `localhost` with your Looker instance domain name (i.e. _companyname_.looker.com). 
    5) Make sure your Looker instance is configured to a working API Host URL by going to Admin > API in your Looker instance and checking the API Host URL field. A blank field is the default for Looker to auto-detect the API Host URL.
 - Run any file in the shell with `python <<filename>>`
@@ -31,4 +31,4 @@ Python examples of how to use the Looker API
 |update_user.py|Update user parameters with a CSV| In the script, reference a CSV which maps individual user IDs to whichever user parameters you would like to update. Use the `/users/{user_id}/credentials_email` endpoint to update email/password login information.|
 |update_static_filter.py|Update a static filter value on a look| Illustrates how to update a static value associated with a filter field|
 |delete_expired_schedules.py|Delete schedules that have an expiry date in the title|Gets a list of all schedules and then checks the title for an expiry date specified in the title.  If the current date is past that date, delete the schedule|
-
+|model_migration.py|Move a list of looks to use a new model| Illustrates how to update queries associated with looks to migrate a subset of content to a new model|
