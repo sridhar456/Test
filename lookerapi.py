@@ -282,3 +282,12 @@ class LookerApi(object):
         r = self.session.delete(url,params=params)
         if r.status_code == requests.codes.ok:
             return r.json()
+
+# POST POST /groups/{group_id}/users
+    def add_users_to_group(self,group_id,user_id):
+         url = '{}{}/{}/{}'.format(self.host,'groups',group_id,'users')
+         print url
+         params = json.dumps({'user_id': user_id})
+         r = self.session.post(url,data=params)
+         if r.status_code == requests.codes.ok:
+             return r.json()
