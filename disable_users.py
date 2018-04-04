@@ -50,27 +50,33 @@ for u in all_users:
 			no_login_count += 1
 			ids_to_disable.append(uid)
 
-# print ids_to_disable
-
+print ids_to_disable
+print "Disabling Users"
 for u in ids_to_disable:
 	user_info_body =  looker.get_user(u)
 	# print user_info_body
 	if user_info_body['presumed_looker_employee'] == False:
 		
 		try:
-			email = user_info_body['email'].split('@')[1]
-			# print email
+			try: 
+				email = user_info_body['email'].split('@')[1]
+			except:
+				email = "nothing.com"
+				# raise
+			print email
 			if email != 'looker.com':
 
 				#### Comment out the next line and uncomment the one after!
 				print user_info_body['email'] ,"would be disabled if you uncommented the next line"
-				# user_info_body.is_disabled = True
+				# user_info_body['is_disabled'] = True
 			
 
 			# print user_info_body.email
-			looker.update_user(u,user_info_body )
+			print user_info_body
+			looker.update_user(u,user_info_body)
 		except: 
 			print "email or update error"
+			raise
 			errors += 1
 
 print " ----------------------------- "
