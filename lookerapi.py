@@ -43,17 +43,22 @@ class LookerApi(object):
         pp(r.request.body)
         pp(r.json())
 
-# PATCH
-    def update_dashboard(self, dashboard_id):
+# GET
+    def get_dashboard(self, dashboard_id,fields=''):
         url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
-        params = json.dumps({'load_configuration':'prefetch_cache_run'
-                  })
-        print url
-        print params
-        r = self.session.patch(url,data=params)
-        pp(r.request.url)
-        pp(r.request.body)
-        pp(r.json())
+        params = {"fields":fields}
+        r = self.session.get(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+# PATCH
+    def update_dashboard(self,dashboard_id,body={},fields=''):
+        url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
+        body = json.dumps(body)
+        params = {"fields":fields}
+        print " --- updating dashboard --- "
+        r = self.session.patch(url,data=body,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
 
     def get_look_info(self,look_id,fields=''):
         url = '{}{}/{}'.format(self.host,'looks',look_id)
@@ -121,7 +126,6 @@ class LookerApi(object):
 # PATCH /looks/<look_id>
     def update_look(self,look_id,body,fields=''):
         url = '{}{}/{}'.format(self.host,'looks',look_id)
-        print url
         body = json.dumps(body)
         params = {"fields":fields}
         print " --- updating look --- "
@@ -366,7 +370,7 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 
-# POST POST /groups/{group_id}/users
+# POST /groups/{group_id}/users
     def add_users_to_group(self,group_id,user_id):
          url = '{}{}/{}/{}'.format(self.host,'groups',group_id,'users')
          print url
