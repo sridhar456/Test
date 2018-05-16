@@ -51,12 +51,11 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 # PATCH
-    def update_dashboard(self,dashboard_id,body={},fields=''):
+    def update_dashboard(self,dashboard_id,body={}):
         url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
         body = json.dumps(body)
-        params = {"fields":fields}
         print " --- updating dashboard --- "
-        r = self.session.patch(url,data=body,params=params)
+        r = self.session.patch(url,data=body)
         if r.status_code == requests.codes.ok:
             return r.json()
 
