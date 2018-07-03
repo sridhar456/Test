@@ -369,6 +369,25 @@ class LookerApi(object):
         if r.status_code == requests.codes.ok:
             return r.json()
 
+# GET /dashboards/dashboard_filters/{dashboard_id}
+    def get_dashboard_dashboard_filters(self,dashboard_id,fields=''):
+        url = '{}{}/{}/{}'.format(self.host,'dashboards',dashboard_id,'dashboard_filters')
+        print url
+        params = {"fields":fields}
+        r = self.session.get(url,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+
+# PATCH /dashboard_filters/{dashboard_filter_id}
+    def update_dashboard_filter(self,dashboard_filter_id,model_name,fields=''):
+        url = '{}{}/{}'.format(self.host,'dashboard_filters',dashboard_filter_id)
+        print url
+        body = json.dumps({'model': model_name})
+        params = {"fields":fields}
+        r = self.session.patch(url,data=body,params=params)
+        if r.status_code == requests.codes.ok:
+            return r.json()
+
 # POST /groups/{group_id}/users
     def add_users_to_group(self,group_id,user_id):
          url = '{}{}/{}/{}'.format(self.host,'groups',group_id,'users')
