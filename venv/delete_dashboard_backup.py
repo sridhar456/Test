@@ -2,20 +2,22 @@
 import requests
 from pprint import pprint as pp
 import json
+import re
 
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-#from requests.packages.urllib3.exceptions import InsecureRequestWarning
-#requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+class LookerApi(object):  
 
-class LookerApi(object):
+    def __init__(self, token, secret, host):
 
-
-    def __init__(self,token,secret,host):
         self.token = token
         self.secret = secret
         self.host = host
+
         self.session = requests.Session()
         self.session.verify = False
+
         self.auth()
 
     def auth(self):
@@ -41,31 +43,6 @@ class LookerApi(object):
         pp(r.request.body)
         pp(r.json())
 
-    def get_look_data(self, look_id, clientId, clientSecret, host):
-        url = '{}{}'.format(host, 'login')
-        params = {'client_id': clientId,
-                  'client_secret': clientSecret
-                  }
-        r = self.session.post(url, params=params)
-        access_token = r.json().get('access_token')
-        print(access_token)
-        # print access_token
-        self.session.headers.update({'Authorization': 'token {}'.format(access_token)})
-
-        lookURL = "https://dev.looker.turner.com:19999/api/3.1/looks/"+str(look_id)+"/run/json?limit=5000"
-        lookRes = self.session.get(lookURL)
-        body = {
-                  "model":"eg_ad_server",
-                  "view":"pdt_dfp_operative_temp",
-                  "fields":["pdt_dfp_operative_temp.activity_date", "pdt_dfp_operative_temp.total_capacity", "pdt_dfp_operative_temp.modality"],
-                  "filters":{"pdt_dfp_operative_temp.brand_filter":"CNN", "pdt_dfp_operative_temp.country_new":"US", "pdt_dfp_operative_temp.activity_date":"14 days"},
-                  "sorts":["pdt_dfp_operative_temp.activity_date desc"],
-                  "limit":"500",
-                  "query_timezone":"America/New_York"
-               }
-        inlineRes = self.run_inline_query(body)
-        return inlineRes
-
 # GET
     def get_dashboard(self, dashboard_id,fields=''):
         url = '{}{}/{}'.format(self.host,'dashboards',dashboard_id)
@@ -87,7 +64,6 @@ class LookerApi(object):
         print(url)
         params = {"fields":fields}
         r = self.session.get(url,params=params)
-        print(r.status_code)
         if r.status_code == requests.codes.ok:
             return r.json()
 # GET /queries/
@@ -96,7 +72,6 @@ class LookerApi(object):
         print(url)
         params = {"fields":fields}
         r = self.session.get(url,params=params)
-        print(r.status_code)
         if r.status_code == requests.codes.ok:
             return r.json()
 
@@ -105,7 +80,7 @@ class LookerApi(object):
         url = '{}{}'.format(self.host,'queries')
         # print url
         params = json.dumps(query_body)
-        print(" --- creating query --- ")
+        print(" --- creating query --- "
         r = self.session.post(url,data=params, params = json.dumps({"fields": fields}))
         # print r.text
         # print r.status_code
@@ -118,7 +93,7 @@ class LookerApi(object):
             url = '{}{}/{}/run/json'.format(self.host,'queries',query_id)
             # print url
             params = {}
-            print(" --- running query --- ")
+            print(" --- running query --- "
             r = self.session.get(url,params=params)
             if r.status_code == requests.codes.ok:
                 return r.json()
@@ -161,7 +136,7 @@ class LookerApi(object):
         url = '{}{}/{}/run/{}'.format(self.host,'looks',look_id, format)
         params = {}
         r = self.session.get(url,params=params, stream=True)
-        print(r.status_code)
+        print r.status_code
         if r.status_code == requests.codes.ok:
             image_name = 'test2.xlsx'
             with open(image_name, 'wb') as f:
@@ -272,7 +247,7 @@ class LookerApi(object):
 # GET /users/me
     def get_me(self):
         url = '{}{}'.format(self.host,'user')
-        print("Grabbing Myself: " + url)
+        print("Grabbing Myself: " + url
         params = {}
         r = self.session.get(url,params=params)
         if r.status_code == requests.codes.ok:
@@ -318,8 +293,8 @@ class LookerApi(object):
         url = '{}{}'.format(self.host,'scheduled_plans')
         # print(url)
         params = {'user_id':user_id}
-        r = self.session.get(url,params=params)
-        if r.status_code == requests.codes.ok:
+	r = self.session.get(url,params=params)
+	if r.status_code == requests.codes.ok:
             return r.json()
 
 #GET /scheduled_plans/look/{dashboard_id}
@@ -345,7 +320,6 @@ class LookerApi(object):
         url = '{}{}/{}'.format(self.host,'scheduled_plans',plan_id)
         params = json.dumps(body)
         # print(url)
-
         # print params
         r = self.session.patch(url,data=params)
         # pp(r.request.url)
