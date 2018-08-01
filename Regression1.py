@@ -1,6 +1,7 @@
-import os, json, requests, errno, re, pandas as pd, csv
+import json, requests
 import yaml
 
+# reads config file to get key and secret details
 f = open('config.yml')
 params = yaml.load(f)
 f.close()
@@ -9,13 +10,12 @@ LOOKER_KEY_SECRET = params['hosts'][host]['secret']
 LOOKER_KEY = params['hosts'][host]['token']
 
 
-def getLookToggleData(branch, look_id):
+def getLookToggleData(branch, look_id,):
     key = LOOKER_KEY  # api3
     key_secret = LOOKER_KEY_SECRET
 
-    api_url = "https://dev.looker.turner.com:19999/api/3.0/"
+    api_url = "https://"+host+":19999/api/3.0/"
     auth_data = {'client_id': key, 'client_secret': key_secret}
-    login_url = 'https://dev.looker.turner.com:19999/api/3.0/login'
 
     session = requests.Session()
     r = session.post(api_url + "/login", data=auth_data)
@@ -30,22 +30,19 @@ def getLookToggleData(branch, look_id):
                                data=json.dumps(session_body))
 
         run_look = requests.get(api_url + '/looks/' + look_id + '/run/json',
-                                headers={'Authorization': "token " + json_auth['access_token']})
-
-        devData = run_look.json()
-        print(devData)
-        print(len(devData))
-        return devData
+                                headers={'Authorization': "token " + json_auth['access_token'],'cache': 'false'})
     else:
-        master_run_look = requests.get(api_url + '/looks/' + look_id + '/run/json',
-                                       headers={'Authorization': "token " + json_auth['access_token']})
+        run_look = requests.get(api_url + '/looks/' + look_id + '/run/json',
+                                       headers={'Authorization': "token " + json_auth['access_token'],'cache': 'false'})
 
-        masterData = master_run_look.json()
-        print(masterData)
-        print(len(masterData))
-        return masterData
+    lookData = run_look.json()
+    print(lookData)
+    print(len(lookData))
+    return lookData
 
-
+# loops through different parameters in the data
+# Adds all the if the parameter value is a string
+# Calculates sum if the parameter value is a number
 def finalResults(masterData, devData):
     finalList = []
     # Looping through the parameters in result
@@ -55,19 +52,25 @@ def finalResults(masterData, devData):
         # if it's a string get distinct lists in every result and return different elements in each list
         if type(devData[0][diff_param]) == float or type(devData[0][diff_param]) == int:
             print('printing' + diff_param)
-            sumList = []
             masterSum = 0
             for elem in masterData:
                 if diff_param in elem:
                     masterSum += elem[diff_param]
-            sumList.append(masterSum)
+            finalList.append({'master_' + diff_param: masterSum})
             devSum = 0
             for elem in devData:
                 if diff_param in elem:
                     devSum += elem[diff_param]
-            sumList.append(devSum)
-            finalList.append({'master_' + diff_param: sumList[0]})
-            finalList.append({'dev_' + diff_param: sumList[1]})
+            finalList.append({'dev_' + diff_param: devSum})
+            if masterSum == devSum:
+                print(diff_param + " sums match")
+                #finalList.append(diff_param + " sums match")
+            elif masterSum > devSum:
+                percent = (masterSum-devSum)/devSum*100
+                print(diff_param+"master sum is greater than dev sum by "+str(percent)+"%")
+            else:
+                percent = (devSum-masterSum)/masterSum*100
+                print(diff_param + "dev sum is greater than master sum by " + str(percent) + "%")
         else:
             diffList = checkDiff(masterData, devData, diff_param)
             finalList.append({'master_' + diff_param: diffList[0]})
@@ -124,15 +127,16 @@ def get_distinct_elements(modalityList, parameter):
 
     return distinctElementsList
 
+# Obtaining extra lists and sum counts for the provided look id
+# Writing the data into csv
+def getDataAndWriteToFile(look_id):
+    masterData = getLookToggleData('master',look_id)
+    devData = getLookToggleData('dev', look_id)
+    finalList = finalResults(masterData, devData)
+    print(finalList)
 
-masterData = getLookToggleData('master', '6203')
-devData = getLookToggleData('dev', '6203')
-finalList = finalResults(masterData, devData)
-print(finalList)
+    resultsFile = open('Auto_'+look_id+'.csv', 'w', newline='')
+    with resultsFile as filehandle:
+        for elem in finalList:
+            filehandle.write('%s\n' % elem)
 
-resultsFile = open('C:\Data Files\Impression.csv', 'w', newline='')
-with resultsFile as filehandle:
-    for elem in finalList:
-        filehandle.write('%s\n' % elem)
-
-print('done')
